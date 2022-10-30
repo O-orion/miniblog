@@ -1,5 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
+import { useAuthentication } from '../../hooks/UserAuthentication';
+import { db } from '../../firebase/config'
 
 //CSS
 import styles from './register.module.css'
@@ -12,7 +14,10 @@ const Register = () => {
     const [ confirmSenha, setConfirmSenha ] = useState("");
     const [ error, setError ] = useState("")
 
-    const handleSubmit = (e) => {
+    // Importando nosso hook
+    const { createUser, error: authError,  loading } = useAuthentication();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         setError("")
@@ -23,15 +28,27 @@ const Register = () => {
             senha
         }
 
+
+        
         // validação da senha
         if( senha !== confirmSenha ){
             setError("Por gentileza. As senhas precisam ser iguais")
             return
         }
+        
+        const res = await  createUser(user)
 
-
-        console.log(user)
+        // console.log(res)
     }
+
+    // verificando se existe error
+    useEffect(() => {
+
+        if(authError){
+            setError(authError)
+        }
+
+    }, [authError]) // verificando se ocorreu alguma alteração no valor de authError;
 
   return (
     <div className={styles.register}>
@@ -87,7 +104,9 @@ const Register = () => {
                 />
             </label>
 
-            <button type='submit' className='btn'>Criar novo Usuário!</button>
+            { !loading && <button type='submit' className='btn'>Criar novo Usuário!</button>}
+            {loading && <button className='btn' disabled>Aguarde...</button>}
+            
             {
                 error && <p className='error'>{error}</p>
             }

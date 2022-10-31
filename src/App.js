@@ -61,7 +61,7 @@ function App() {
                 <Route path='/about' element={<About />}></Route>
                 <Route path='/login' element={ !user ? <Login /> : <Navigate to="/home" /> }></Route> {/*  O ternário é para bloquear usuário não autorizados, não logados */}
                 <Route path='/register' element={ !user ? <Register /> : <Navigate to="/home" />}></Route>
-                <Route path='/posts/create' elemen t={ user ? <CreatePost></CreatePost> : <Navigate to="/login" />}></Route>
+                <Route path='/posts/create' element={ user ? <CreatePost /> : <Navigate to="/login" />}></Route>
                 <Route path='/dashboard' element={ user ? <Dashboard></Dashboard> : <Navigate to="/login" /> } ></Route>
               </Routes>
             </div>

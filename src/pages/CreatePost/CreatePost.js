@@ -3,9 +3,11 @@ import React from 'react'
 import { useState } from 'react'
 import { useNavigate  } from 'react-router-dom'
 import { useAuthValue } from '../../context/AuthContext'
+import { useInsertDocument } from '../../hooks/useInsertDocument'
 
 // Import CSS
 import styles  from './CreatePost.module.css'
+
 
 const CreatePost = () => {
 
@@ -15,8 +17,47 @@ const CreatePost = () => {
   const [ tags, setTags ] = useState("");
   const [ formError, setFormError ] = useState("");
 
+  
+  const { user } = useAuthValue()
+
+  const { insertDocument, response } = useInsertDocument("posts");
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setFormError("")
+
+    // Validar URL da iamgem
+    try {
+      new URL(img)
+    } catch (error) {
+      setFormError("Insira a URL da imagem, por gentileza!");
+    }
+
+    // Cria array de tags
+    const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase())
+
+    // Criar as validações
+
+    // Verificando se os campos estão preenchidos
+    if(!title || !img || !tagsArray || !body){
+      setFormError("Por favor, preencha todos os campos!")
+    }
+
+    if(formError){
+      return
+    }
+
+    insertDocument({
+      title,
+      img,
+      body,
+      tags,
+      user: user.uid,
+      createdBy: user.displayName
+    })
+
+    navigate("/home")
   }
 
   return (
@@ -75,13 +116,14 @@ const CreatePost = () => {
            value={ tags }
             />
         </label>
-        <button className='btn'>Salvar Post</button>
 
-        {/*{!loading && <button className='btn'>Salvar Post</button>}
-        {loading && (
+
+        {!response.loading && <button className='btn'>Salvar Post</button>}
+        {response.loading && (
           <button className='btn' disabled >Aguarde...</button>
         )}
-        {formError && <p className='error'>{formError}</p>} */}
+        {response.error && <p className='error'>{response.error}</p>} 
+        {formError && <p className='error'>{formError}</p>} 
 
       </form>
     </div>

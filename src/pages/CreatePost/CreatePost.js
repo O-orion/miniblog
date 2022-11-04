@@ -52,7 +52,7 @@ const CreatePost = () => {
       title,
       img,
       body,
-      tags,
+      tags: tagsArray,
       user: user.uid,
       createdBy: user.displayName
     })
